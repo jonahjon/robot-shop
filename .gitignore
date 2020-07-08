@@ -4,3 +4,4 @@
 vendor/
 Gopkg.lock
 */node_modules
+K8s/terraform/.terraform/
