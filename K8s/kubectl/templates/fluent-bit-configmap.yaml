@@ -1,0 +1,40 @@
+---
+# Source: aws-for-fluent-bit/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fluent-aws-for-fluent-bit
+  namespace: robotshop
+  labels:
+    app.kubernetes.io/name: aws-for-fluent-bit
+    app.kubernetes.io/instance: robotshop
+    app.kubernetes.io/version: "2.2.0"
+data:
+  fluent-bit.conf: |
+    [SERVICE]
+        Parsers_File /fluent-bit/parsers/parsers.conf
+
+    [INPUT]
+        Name              tail
+        Tag               kube.*
+        Path              /var/log/containers/*.log
+        DB                /var/log/flb_kube.db
+        Parser            docker
+        Docker_Mode       On
+        Mem_Buf_Limit     5MB
+        Skip_Long_Lines   On
+        Refresh_Interval  10
+
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Kube_URL            https://kubernetes.default.svc.cluster.local:443
+        Merge_Log           On
+        Merge_Log_Key       data
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude On
+    [OUTPUT]
+        Name            firehose
+        Match           *
+        region          us-west-2
+        delivery_stream robotshop

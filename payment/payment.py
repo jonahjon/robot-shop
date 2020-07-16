@@ -13,8 +13,8 @@ from flask import Response
 from flask import request
 from flask import jsonify
 from rabbitmq import Publisher
-from aws_xray_sdk.core import xray_recorder
-from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
+# from aws_xray_sdk.core import xray_recorder
+# from aws_xray_sdk.ext.flask.middleware import XRayMiddleware
 
 
 # Prometheus
@@ -24,14 +24,15 @@ from prometheus_client import Counter, Histogram
 app = Flask(__name__)
 app.logger.setLevel(logging.INFO)
 
-daemon_address = os.getenv('AWS_XRAY_DAEMON_ADDRESS', 'xray:2000')
+# daemon_address = os.getenv('AWS_XRAY_DAEMON_ADDRESS', 'xray:2000')
 
-xray_recorder.configure(
-    service='Robot-Shop-Payments',
-    daemon_address=daemon_address
-)
+# xray_recorder.configure(
+#     service='Robot-Shop-Payments',
+#     daemon_address=daemon_address,
+#     sampling=False
+# )
 
-XRayMiddleware(app, xray_recorder)
+# XRayMiddleware(app, xray_recorder)
 
 CART = os.getenv('CART_HOST', 'cart')
 USER = os.getenv('USER_HOST', 'user')

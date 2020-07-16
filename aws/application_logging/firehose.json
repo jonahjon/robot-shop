@@ -1,0 +1,39 @@
+{
+    "DeliveryStreamName": "robotshop-logs",
+    "DeliveryStreamType": "DirectPut",
+    "ElasticsearchDestinationConfiguration": {
+        "RoleARN": "arn:aws:es:us-west-2:164382793440:domain/firehose_delivery_role",
+        "DomainARN": "arn:aws:es:us-west-2:164382793440:domain/robotshop",
+        "IndexName": "robotshop",
+        "IndexRotationPeriod": "OneMonth"
+    },
+    "S3BackupMode": "FailedDocumentsOnly",
+    "S3DestinationDescription": {
+        "BucketARN": "arn:aws:s3:::us-west-2-robotshop-es",
+        "Prefix": "",
+        "BufferingHints": {
+            "SizeInMBs": 5,
+            "IntervalInSeconds": 300
+        },
+        "CompressionFormat": "UNCOMPRESSED",
+        "EncryptionConfiguration": {
+            "NoEncryptionConfig": "NoEncryption"
+        },
+        "CloudWatchLoggingOptions": {
+            "Enabled": true,
+            "LogGroupName": "/aws/kinesisfirehose/robotshop",
+            "LogStreamName": "S3Delivery"
+        }
+    },
+    "CloudWatchLoggingOptions": {
+        "Enabled": true,
+        "LogGroupName": "/aws/kinesisfirehose/robotshop",
+        "LogStreamName": "ElasticsearchDelivery"
+    },
+    "Tags": [
+        {
+            "Key": "eks-accelerator",
+            "Value": "true"
+        }
+    ]
+}

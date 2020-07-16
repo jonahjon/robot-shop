@@ -37,6 +37,7 @@ spec:
       containers:
       - name: payment
         image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/payment
+        imagePullPolicy: Always
         env:
           - name: AWS_XRAY_DAEMON_ADDRESS
             value: 'xray-service.robotshop:2000'

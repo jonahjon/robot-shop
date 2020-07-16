@@ -30,9 +30,14 @@ spec:
           image: amazon/aws-xray-daemon:latest
           imagePullPolicy: Always
           ports:
-            - containerPort: 2000
+            - name: xray-udp
+              containerPort: 2000
               hostPort: 2000
               protocol: UDP
+            - name: xray-tcp
+              containerPort: 2000
+              hostPort: 2000
+              protocol: TCP
           resources:
             limits:
               cpu:  100m
