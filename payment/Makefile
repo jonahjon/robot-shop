@@ -1,8 +1,9 @@
 IMG_NAME = robot-shop/payment
-ACCOUNT_JJ=164382793440
-DOCKER_PUSH_REPOSITORY=dkr.ecr.us-west-2.amazonaws.com
+ACCOUNT?=164382793440
+AWS_DEFAULT_REGION?=us-west-2
+DOCKER_PUSH_REPOSITORY?=dkr.ecr.$(AWS_DEFAULT_REGION).amazonaws.com
 TAG?=latest
-IMAGE=$(ACCOUNT_JJ).$(DOCKER_PUSH_REPOSITORY)/$(IMG_NAME)
+IMAGE=$(ACCOUNT).$(DOCKER_PUSH_REPOSITORY)/$(IMG_NAME)
 
 
 ci-pr: build-image push-image
@@ -12,4 +13,6 @@ build-image:
 	docker build -t $(IMG_NAME) .
 push-image:
 	docker tag $(IMG_NAME) $(IMAGE):$(TAG)
-	docker push $(IMAGE):$(TAG) 
+	docker tag $(IMG_NAME) $(IMAGE):latest
+	docker push $(IMAGE):$(TAG)
+	docker push $(IMAGE):latest
