@@ -1,21 +1,25 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 export AWS_DEFAULT_REGION=us-west-2
 
-aws ecr create-repository --repository-name robot-shop/cart || true
-aws ecr create-repository --repository-name robot-shop/catalogue || true
-aws ecr create-repository --repository-name robot-shop/dispatch || true
-aws ecr create-repository --repository-name robot-shop/load-gen || true
-aws ecr create-repository --repository-name robot-shop/mongo || true
-aws ecr create-repository --repository-name robot-shop/mysql || true
-aws ecr create-repository --repository-name robot-shop/payment || true
-aws ecr create-repository --repository-name robot-shop/ratings || true
-aws ecr create-repository --repository-name robot-shop/shipping || true
-aws ecr create-repository --repository-name robot-shop/payment || true
-aws ecr create-repository --repository-name robot-shop/user || true
-aws ecr create-repository --repository-name robot-shop/web || true
+services="cart \
+          catalogue \
+          dispatch \
+          load-gen \
+          mongo \
+          mysql \
+          payment \
+          ratings \
+          shipping \
+          user \
+          web"
 
-
-
+for service in $services; do
+    aws ecr create-repository \
+        --repository-name robot-shop/$service \
+        --image-tag-mutability IMMUTABLE \
+        --image-scanning-configuration scanOnPush=true \
+        --region us-west-2 || true
+done
