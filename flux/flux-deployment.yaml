@@ -144,9 +144,7 @@ spec:
         # https://$(GIT_AUTHUSER):$(GIT_AUTHKEY)@github.com/user/repository.git
         - --git-url=git@github.com:jonahjon/robot-shop.git
         - --git-branch=master
-        # Include this if you want to restrict the manifests considered by flux
-        # to those under the following relative paths in the git repository
-        # - --git-path=subdir1,subdir2
+        - --git-path=K8s/kubectl/templates
         - --git-label=flux
         - --git-user=Flux
         - --git-email=jonahjones094@gmail.com
