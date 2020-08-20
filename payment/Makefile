@@ -12,7 +12,7 @@ ci-release: build-image push-image
 build-image:
 	docker build -t $(IMG_NAME) .
 push-image:
-	docker tag $(IMG_NAME) $(IMAGE):$(TAG)
-	docker tag $(IMG_NAME) $(IMAGE):latest
-	docker push $(IMAGE):$(TAG)
-	docker push $(IMAGE):latest
+	# docker tag $(IMG_NAME) $(IMAGE):$(TAG)
+	docker tag $(IMG_NAME) $(IMAGE):v.0.2
+	# docker push $(IMAGE):$(TAG)
+	docker push $(IMAGE):v.0.2

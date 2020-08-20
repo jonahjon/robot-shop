@@ -53,6 +53,10 @@ def exception_handler(err):
 def health():
     return 'OK'
 
+@app.route('/version', methods=['GET'])
+def version():
+    return 'v.0.0'
+
 # Prometheus
 @app.route('/metrics', methods=['GET'])
 def metrics():
