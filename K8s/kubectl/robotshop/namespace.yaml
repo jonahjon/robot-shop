@@ -4,4 +4,4 @@ metadata:
   name: robotshop
   labels:
     istio-operator-managed: Reconcile
-    istio-injection: disabled
+    istio-injection: enabled

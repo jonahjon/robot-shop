@@ -1,0 +1,51 @@
+{
+    "apiVersion": "v1",
+    "kind": "Namespace",
+    "metadata": {
+        "annotations": {
+            "fluxcd.io/sync-checksum": "2f40c5729bfec49f3141af3542584912b07c4164",
+            "kubectl.kubernetes.io/last-applied-configuration": "{\"apiVersion\":\"v1\",\"kind\":\"Namespace\",\"metadata\":{\"annotations\":{\"fluxcd.io/sync-checksum\":\"2f40c5729bfec49f3141af3542584912b07c4164\"},\"labels\":{\"fluxcd.io/sync-gc-mark\":\"sha256.XG0QNIlbHCLbnUv_969MWVny0cvEWfOZS2fER_JcdPs\"},\"name\":\"robotshop\"}}\n"
+        },
+        "creationTimestamp": "2020-07-13T14:42:46Z",
+        "deletionTimestamp": "2020-08-20T15:24:15Z",
+        "labels": {
+            "fluxcd.io/sync-gc-mark": "sha256.XG0QNIlbHCLbnUv_969MWVny0cvEWfOZS2fER_JcdPs",
+            "istio-injection": "enabled"
+        },
+        "name": "robotshop",
+        "resourceVersion": "11603904",
+        "selfLink": "/api/v1/namespaces/robotshop",
+        "uid": "b6e451ac-c2da-4dd1-8a43-9534784b920e"
+    },
+    "spec": {
+        "finalizers": [
+            ""
+        ]
+    },
+    "status": {
+        "conditions": [
+            {
+                "lastTransitionTime": "2020-08-20T15:24:25Z",
+                "message": "All resources successfully discovered",
+                "reason": "ResourcesDiscovered",
+                "status": "False",
+                "type": "NamespaceDeletionDiscoveryFailure"
+            },
+            {
+                "lastTransitionTime": "2020-08-20T15:24:25Z",
+                "message": "All legacy kube types successfully parsed",
+                "reason": "ParsedGroupVersions",
+                "status": "False",
+                "type": "NamespaceDeletionGroupVersionParsingFailure"
+            },
+            {
+                "lastTransitionTime": "2020-08-20T15:25:06Z",
+                "message": "All content successfully deleted",
+                "reason": "ContentDeleted",
+                "status": "False",
+                "type": "NamespaceDeletionContentFailure"
+            }
+        ],
+        "phase": "Terminating"
+    }
+}

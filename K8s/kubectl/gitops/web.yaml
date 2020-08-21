@@ -1,65 +1,44 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    prometheus.io/scrape: 'true'
-    prometheus.io/path: /metrics
-    prometheus.io/port: "8080"
   namespace: robotshop
-  name: payment
+  name: web
   labels:
-    service: payment
+    service: web
 spec:
   ports:
   - name: http
-    port: 8080
+    port: 80
     targetPort: 8080
   selector:
-    service: payment
+    service: web
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: robotshop
-  name: payment
+  name: web
   labels:
-    app: payment
+    app: web
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     rollingUpdate:
       maxUnavailable: 0
     type: RollingUpdate
   selector:
     matchLabels:
-      app: payment
+      app: web
   template:
     metadata:
       labels:
-        app: payment
+        app: web
     spec:
       serviceAccountName: robot-shop
       containers:
-      - name: payment
-        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/payment:v.0.1
+      - name: web
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/web
         imagePullPolicy: Always
-        livenessProbe:
-          exec:
-            command:
-            - curl
-            - localhost:8080/health
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-        readinessProbe:
-          exec:
-            command:
-            - curl
-            - localhost:8080/health
-          initialDelaySeconds: 30
-          timeoutSeconds: 5
-        env:
-          - name: AWS_XRAY_DAEMON_ADDRESS
-            value: 'xray-service.robotshop:2000'
         ports:
         - containerPort: 8080
         resources:
@@ -75,15 +54,15 @@ spec:
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: payment
+  name: web
   namespace: robotshop
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: payment
+    name: web
   minReplicas: 1
-  maxReplicas: 2
+  maxReplicas: 3
   metrics:
   - type: Resource
     resource:
@@ -94,30 +73,25 @@ spec:
 apiVersion: flagger.app/v1beta1
 kind: Canary
 metadata:
-  name: payment
+  name: web
   namespace: robotshop
 spec:
   # deployment reference
   targetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: payment
+    name: web
   progressDeadlineSeconds: 60
   # HPA reference (optional)
   autoscalerRef:
     apiVersion: autoscaling/v2beta1
     kind: HorizontalPodAutoscaler
-    name: payment
+    name: web
   service:
     port: 8080
     trafficPolicy:
       tls:
         mode: DISABLE
-    gateways:
-    - istio-ingressgateway.istio-system.svc.cluster.local
-    # Istio virtual service host names (optional)
-    hosts:
-    - "*"
   # promote the canary without analysing it (default false)
   skipAnalysis: false
   analysis:
