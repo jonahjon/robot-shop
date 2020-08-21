@@ -31,7 +31,7 @@ git:
   repo:
     url: git@github.com:jonahjon/robot-shop
     branch: "master"
-    paths: ["K8s/kubectl/robotshop", "K8s/kubectl/robotshop/bootstrap"]
+    paths: ["K8s/kubectl/robotshop"]
     fluxPath: "flux/"
     user: "gitops"
     email: "jonahjones094@gmail.com"
