@@ -13,7 +13,6 @@ spec:
   ports:
   - name: http
     port: 8080
-    targetPort: 8080
   selector:
     service: payment
 ---
@@ -23,28 +22,25 @@ metadata:
   namespace: robotshop
   name: payment
   labels:
-    service: payment
-    stage: prod
+    app: payment
 spec:
-  replicas: 1
+  replicas: 2
   strategy:
     rollingUpdate:
-      maxUnavailable: 0
+      maxUnavailable: 1
     type: RollingUpdate
   selector:
     matchLabels:
-      service: payment
-      stage: prod
+      app: payment
   template:
     metadata:
       labels:
-        service: payment
-        stage: prod
+        app: payment
     spec:
       serviceAccountName: robot-shop
       containers:
       - name: payment
-        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/payment
+        image: 164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/payment:v.0.1
         imagePullPolicy: Always
         livenessProbe:
           exec:

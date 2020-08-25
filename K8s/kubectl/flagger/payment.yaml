@@ -1,0 +1,44 @@
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: payment
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: payment
+  minReplicas: 2
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+---
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: payment
+  namespace: robotshop
+spec:
+  provider: kubernetes
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: payment
+  progressDeadlineSeconds: 60
+  autoscalerRef:
+    apiVersion: autoscaling/v2beta1
+    kind: HorizontalPodAutoscaler
+    name: payment
+  service:
+    port: 8080
+    portDiscovery: true
+  analysis:
+    # schedule interval (default 60s)
+    interval: 15s
+    # max number of failed metric checks before rollback
+    threshold: 2
+    # max traffic percentage routed to canary
+    iterations: 5
+    # percentage (0-100)

@@ -55,7 +55,7 @@ def health():
 
 @app.route('/version', methods=['GET'])
 def version():
-    return 'v.0.0'
+    return 'v.0.6'
 
 # Prometheus
 @app.route('/metrics', methods=['GET'])

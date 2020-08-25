@@ -1,0 +1,44 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: robotshop-git
+  region: us-west-2
+
+iam:
+  withOIDC: true
+
+nodeGroups:
+  - name: robotshop-ng-a-2
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    availabilityZones: ["us-west-2a"]
+    ssh:
+      publicKeyName: kube
+    volumeSize: 50
+
+git:
+  repo:
+    url: git@github.com:jonahjon/robot-shop
+    branch: "master"
+    paths: ["K8s/kubectl/robotshop"]
+    fluxPath: "flux/"
+    user: "gitops"
+    email: "jonahjones094@gmail.com"
+  operator:
+    namespace: "flux"
+    withHelm: true
+  bootstrapProfile:
+    source: "https://github.com/jonahjon/robot-shop-quickstart-profile"
+    revision: "master"
+

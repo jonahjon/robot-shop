@@ -1,0 +1,52 @@
+#Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+  namespace: robotshop
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 2
+  maxReplicas: 3
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      targetAverageUtilization: 50
+---
+#Horizontal Pod Autoscaler
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: web
+  namespace: robotshop
+spec:
+  # deployment reference
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  progressDeadlineSeconds: 60
+  # HPA reference (optional)
+  autoscalerRef:
+    apiVersion: autoscaling/v2beta1
+    kind: HorizontalPodAutoscaler
+    name: web
+  service:
+    port: 8080
+    trafficPolicy:
+      tls:
+        mode: DISABLE
+  # promote the canary without analysing it (default false)
+  skipAnalysis: false
+  analysis:
+    # schedule interval (default 60s)
+    interval: 15s
+    # max number of failed metric checks before rollback
+    threshold: 2
+    # max traffic percentage routed to canary
+    iterations: 5
+    # percentage (0-100)

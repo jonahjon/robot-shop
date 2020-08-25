@@ -13,6 +13,6 @@ build-image:
 	docker build -t $(IMG_NAME) .
 push-image:
 	# docker tag $(IMG_NAME) $(IMAGE):$(TAG)
-	docker tag $(IMG_NAME) $(IMAGE):v.0.2
+	docker tag $(IMG_NAME) $(IMAGE):v.0.6
 	# docker push $(IMAGE):$(TAG)
-	docker push $(IMAGE):v.0.2
+	docker push $(IMAGE):v.0.6
