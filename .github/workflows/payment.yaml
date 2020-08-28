@@ -1,0 +1,25 @@
+name: Build EKS Accelerator Payment
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - payment/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:          
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build and Push to ECR
+        uses: mr-smithers-excellent/docker-build-push@v3
+        with:
+          image: robot-shop/payment
+          directory: payment
+          tag: ${{ github.sha }}
+          registry: 164382793440.dkr.ecr.us-west-2.amazonaws.com
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

@@ -1,0 +1,35 @@
+name: Publish EKS Accelerator
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: [self-hosted, ubuntu]
+    steps:          
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Build and Push to ECR
+        uses: mr-smithers-excellent/docker-build-push@v3
+        with:
+          image: github-runner
+          directory: images/github-runner
+          tag: ${{ github.sha }}
+          registry: 164382793440.dkr.ecr.us-west-2.amazonaws.com
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: deploy to cluster
+        uses: steebchen/kubectl@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+        with:
+          args: set image --record deployment/cart container=${{ github.repository }}:${{ github.sha }}
+      - name: verify deployment
+        uses: steebchen/kubectl@master
+        env:
+          KUBE_CONFIG_DATA: ${{ secrets.KUBE_CONFIG_DATA }}
+          KUBECTL_VERSION: "1.16"
+        with:
+          args: '"rollout status deployment/cart"'
