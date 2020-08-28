@@ -17,7 +17,7 @@ jobs:
         uses: mr-smithers-excellent/docker-build-push@v3
         with:
           image: robot-shop/payment
-          directory: payment/
+          dockerfile: payment/github_actions_Dockerfile
           tag: ${{ github.sha }}
           registry: 164382793440.dkr.ecr.us-west-2.amazonaws.com
         env:
