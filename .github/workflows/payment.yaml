@@ -18,7 +18,7 @@ jobs:
         with:
           image: robot-shop/payment
           dockerfile: payment/github_actions_Dockerfile
-          tag: ${{ github.sha }}
+          tag: latest
           registry: 164382793440.dkr.ecr.us-west-2.amazonaws.com
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
