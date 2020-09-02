@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/scrape: 'true'
+    prometheus.io/path: /metrics
+    prometheus.io/port: "8080"
+  namespace: robotshop
+  name: payment
+  labels:
+    service: payment
+spec:
+  ports:
+  - name: http
+    port: 8080
+  selector:
+    service: payment
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: robotshop
+  name: payment
+  labels:
+    app: payment
+spec:
+  replicas: 2
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: payment
+  template:
+    metadata:
+      labels:
+        app: payment
+    spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
+      containers:
+      - name: payment
+        image: {{ .Values.image.repo }}/payment:{{ .Values.image.version }}
+        imagePullPolicy: Always
+        livenessProbe:
+          exec:
+            command:
+            - curl
+            - localhost:8080/health
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        readinessProbe:
+          exec:
+            command:
+            - curl
+            - localhost:8080/health
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        env:
+          - name: AWS_XRAY_DAEMON_ADDRESS
+            value: 'xray-service.robotshop:2000'
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
