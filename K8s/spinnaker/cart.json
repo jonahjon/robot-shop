@@ -1,0 +1,107 @@
+{
+    "keepWaitingPipelines": false,
+    "lastModifiedBy": "anonymous",
+    "limitConcurrent": true,
+    "spelEvaluator": "v4",
+    "stages": [
+      {
+        "account": "eks-spinnaker",
+        "cloudProvider": "kubernetes",
+        "manifests": [
+          {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+              "annotations": {
+                "fluxcd.io/sync-checksum": "783b4ca1b9236edd52c3595aae2bd0c824af72fa"
+              },
+              "labels": {
+                "fluxcd.io/sync-gc-mark": "sha256.wy88aMeg800HXEK5qiGddNrOrzWpg65iWURctAii1HE",
+                "service": "cart"
+              },
+              "name": "cart",
+              "namespace": "robotshop"
+            },
+            "spec": {
+              "replicas": 1,
+              "selector": {
+                "matchLabels": {
+                  "service": "cart"
+                }
+              },
+              "template": {
+                "metadata": {
+                  "labels": {
+                    "service": "cart"
+                  }
+                },
+                "spec": {
+                  "containers": [
+                    {
+                      "env": [
+                        {
+                          "name": "NODE_ENV",
+                          "value": "production"
+                        },
+                        {
+                          "name": "AWS_XRAY_DAEMON_ADDRESS",
+                          "value": "xray-service.robotshop:2000"
+                        }
+                      ],
+                      "image": "164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/cart:${trigger['tag']}",
+                      "imagePullPolicy": "Always",
+                      "name": "cart",
+                      "ports": [
+                        {
+                          "containerPort": 8080
+                        }
+                      ],
+                      "resources": {
+                        "limits": {
+                          "cpu": "200m",
+                          "memory": "100Mi"
+                        },
+                        "requests": {
+                          "cpu": "100m",
+                          "memory": "50Mi"
+                        }
+                      }
+                    }
+                  ],
+                  "serviceAccountName": "robot-shop"
+                }
+              }
+            }
+          }
+        ],
+        "moniker": {
+          "app": "cart"
+        },
+        "name": "Deploy (Manifest)",
+        "namespaceOverride": "robotshop",
+        "refId": "1",
+        "requisiteStageRefIds": [],
+        "skipExpressionEvaluation": false,
+        "source": "text",
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": false,
+            "services": []
+          }
+        },
+        "type": "deployManifest"
+      }
+    ],
+    "triggers": [
+      {
+        "account": "my-ecr-registry",
+        "enabled": true,
+        "organization": "robot-shop",
+        "registry": "164382793440.dkr.ecr.us-west-2.amazonaws.com",
+        "repository": "robot-shop/cart",
+        "type": "docker"
+      }
+    ],
+    "updateTs": "1599075676000"
+  }

@@ -1,0 +1,139 @@
+{
+    "keepWaitingPipelines": false,
+    "lastModifiedBy": "anonymous",
+    "limitConcurrent": true,
+    "parameterConfig": [],
+    "spelEvaluator": "v4",
+    "stages": [
+      {
+        "account": "eks-spinnaker",
+        "cloudProvider": "kubernetes",
+        "manifests": [
+          {
+            "apiVersion": "apps/v1",
+            "kind": "Deployment",
+            "metadata": {
+              "annotations": {
+                "fluxcd.io/sync-checksum": "8950231ae7a1a255e5008f96c1c01fc88b22ec31"
+              },
+              "labels": {
+                "app": "payment",
+                "fluxcd.io/sync-gc-mark": "sha256.2b17ZkM1P3zhszyUIxi7vusVY8LivyBLqMNBpu3nl5w"
+              },
+              "name": "payment",
+              "namespace": "robotshop"
+            },
+            "spec": {
+              "replicas": 2,
+              "selector": {
+                "matchLabels": {
+                  "app": "payment"
+                }
+              },
+              "strategy": {
+                "rollingUpdate": {
+                  "maxUnavailable": 1
+                },
+                "type": "RollingUpdate"
+              },
+              "template": {
+                "metadata": {
+                  "labels": {
+                    "app": "payment"
+                  }
+                },
+                "spec": {
+                  "containers": [
+                    {
+                      "env": [
+                        {
+                          "name": "AWS_XRAY_DAEMON_ADDRESS",
+                          "value": "xray-service.robotshop:2000"
+                        }
+                      ],
+                      "image": "164382793440.dkr.ecr.us-west-2.amazonaws.com/robot-shop/payment:${trigger['tag']}",
+                      "imagePullPolicy": "Always",
+                      "livenessProbe": {
+                        "exec": {
+                          "command": [
+                            "curl",
+                            "localhost:8080/health"
+                          ]
+                        },
+                        "initialDelaySeconds": 5,
+                        "timeoutSeconds": 5
+                      },
+                      "name": "payment",
+                      "ports": [
+                        {
+                          "containerPort": 8080
+                        }
+                      ],
+                      "readinessProbe": {
+                        "exec": {
+                          "command": [
+                            "curl",
+                            "localhost:8080/health"
+                          ]
+                        },
+                        "initialDelaySeconds": 30,
+                        "timeoutSeconds": 5
+                      },
+                      "resources": {
+                        "limits": {
+                          "cpu": "200m",
+                          "memory": "100Mi"
+                        },
+                        "requests": {
+                          "cpu": "100m",
+                          "memory": "50Mi"
+                        }
+                      }
+                    }
+                  ],
+                  "restartPolicy": "Always",
+                  "serviceAccountName": "robot-shop"
+                }
+              }
+            }
+          }
+        ],
+        "moniker": {
+          "app": "payment"
+        },
+        "name": "Deploy (Manifest)",
+        "namespaceOverride": "robotshop",
+        "refId": "1",
+        "requiredArtifactIds": [],
+        "requiredArtifacts": [],
+        "requisiteStageRefIds": [],
+        "skipExpressionEvaluation": false,
+        "source": "text",
+        "stageTimeoutMs": 900000,
+        "trafficManagement": {
+          "enabled": false,
+          "options": {
+            "enableTraffic": true,
+            "namespace": "robotshop",
+            "services": [
+              "service payment"
+            ],
+            "strategy": "highlander"
+          }
+        },
+        "type": "deployManifest"
+      }
+    ],
+    "triggers": [
+      {
+        "account": "my-ecr-registry",
+        "enabled": true,
+        "organization": "robot-shop",
+        "registry": "164382793440.dkr.ecr.us-west-2.amazonaws.com",
+        "repository": "robot-shop/payment",
+        "tag": "",
+        "type": "docker"
+      }
+    ],
+    "updateTs": "1599065359000"
+  }

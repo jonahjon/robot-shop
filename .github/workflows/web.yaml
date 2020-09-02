@@ -1,11 +1,11 @@
-name: Build EKS Accelerator Payment
+name: Build EKS Accelerator Web
 
 on:
   push:
     branches:
     - master
     paths:
-    - payment/**
+    - web/**
 
 jobs:
   build:
@@ -16,8 +16,8 @@ jobs:
       - name: Build and Push to ECR
         uses: mr-smithers-excellent/docker-build-push@v3
         with:
-          image: robot-shop/payment
-          dockerfile: payment/github_actions_Dockerfile
+          image: robot-shop/web
+          dockerfile: web/github_actions_Dockerfile
           tag: ${{ github.sha }}
           registry: 164382793440.dkr.ecr.us-west-2.amazonaws.com
         env:
