@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: robotshop
+  labels:
+    service: redis
+  name: redis
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: 6379
+  selector:
+    service: redis
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  namespace: robotshop
+  name: ebs-ssd-retain
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+# reclaimPolicy: Retain
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: robotshop
+  labels:
+    service: redis
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: redis
+  serviceName: redis
+  template:
+    metadata:
+      labels:
+        service: redis
+    spec:
+      {{ if .Values.psp.enabled }}
+      serviceAccountName: robot-shop
+      {{ end }}
+      containers:
+      - name: redis
+        image: redis:4.0.6
+        ports:
+        - containerPort: 6379
+        volumeMounts:
+          - name: data
+            mountPath: /mnt/redis
+        resources:
+          limits:
+            cpu: 200m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: ebs-ssd-retain
+        resources:
+          requests:
+            storage: 10Gi
+
