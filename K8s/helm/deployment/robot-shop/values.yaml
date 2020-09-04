@@ -1,0 +1,9 @@
+# Registry and rpository for Docker images
+# Default is 212687814973.dkr.ecr.us-west-2.amazonaws.com/robot-shop
+image:
+  repo: 212687814973.dkr.ecr.us-west-2.amazonaws.com/robot-shop
+  version: latest
+
+# Pod Security Policy
+psp:
+  enabled: true
