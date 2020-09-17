@@ -1,0 +1,57 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: robotshop
+  region: us-west-2
+
+managedNodeGroups:
+  - name: robotshop-ng-a
+    tags:
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/robotshop: "owned"
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 3
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        ebs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    availabilityZones: ["us-west-2a"]
+    ssh: # An existing key pair for EC2 host test
+      publicKeyName: id_rsa
+    volumeSize: 50
+    maxPodsPerNode: 100 # this is because we are using Calico
+
+  - name: robotshop-ng-b
+    tags:
+      # EC2 tags required for cluster-autoscaler auto-discovery
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/robotshop: "owned"
+    desiredCapacity: 1
+    minSize: 1
+    maxSize: 2
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        externalDNS: true
+        certManager: true
+        appMesh: true
+        ebs: true
+        fsx: true
+        efs: true
+        albIngress: true
+        xRay: true
+        cloudWatch: true
+    availabilityZones: ["us-west-2b"]
+    ssh: # An existing key pair for EC2 hosts
+      publicKeyName: id_rsa
+    volumeSize: 50
+    maxPodsPerNode: 100 # this is because we are using Calico
