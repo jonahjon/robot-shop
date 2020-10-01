@@ -38,18 +38,6 @@ Parameters:
     Type: String
     Description: Route Table Id for the public subnet.
 
-  PrivateRouteTable01Id:
-    Type: String
-    Description: Route Table Id for the private route table in the 1st AZ.
-
-  PrivateRouteTable02Id:
-    Type: String
-    Description: Route Table Id for the private route table in the 2nd AZ.
-
-  PrivateRouteTable03Id:
-    Type: String
-    Description: Route Table Id for the private route table in the 3rd AZ.
-
   PublicSubnet01Block:
     Type: String
     Default: 100.64.96.0/19
@@ -64,21 +52,6 @@ Parameters:
     Type: String
     Default: 100.64.160.0/19
     Description: CidrBlock for public subnet 03 within the VPC
-
-  PrivateSubnet01Block:
-    Type: String
-    Default: 100.64.0.0/19
-    Description: CidrBlock for private subnet 01 within the VPC
-
-  PrivateSubnet02Block:
-    Type: String
-    Default: 100.64.32.0/19
-    Description: CidrBlock for private subnet 02 within the VPC
-
-  PrivateSubnet03Block:
-    Type: String
-    Default: 100.64.64.0/19
-    Description: CidrBlock for private subnet 03 within the VPC
 
 Resources:
 
@@ -153,66 +126,6 @@ Resources:
           Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
         Value: shared
 
-  PrivateSubnet01:
-    Type: AWS::EC2::Subnet
-    DependsOn: CidrBlock
-    Properties:
-      AvailabilityZone:
-        Ref: AvailabilityZone1
-      CidrBlock:
-        Ref: PrivateSubnet01Block
-      VpcId:
-        Ref: VpcId
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Sub: "${AWS::StackName}-ExpandedPrivateSubnet01"
-      - Key: kubernetes.io/role/internal-elb
-        Value: 1
-      - Key:
-          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
-        Value: shared
-
-  PrivateSubnet02:
-    Type: AWS::EC2::Subnet
-    DependsOn: CidrBlock
-    Properties:
-      AvailabilityZone:
-        Ref: AvailabilityZone2
-      CidrBlock:
-        Ref: PrivateSubnet02Block
-      VpcId:
-        Ref: VpcId
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Sub: "${AWS::StackName}-ExpandedPrivateSubnet02"
-      - Key: kubernetes.io/role/internal-elb
-        Value: 1
-      - Key:
-          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
-        Value: shared
-
-  PrivateSubnet03:
-    Type: AWS::EC2::Subnet
-    DependsOn: CidrBlock
-    Properties:
-      AvailabilityZone:
-        Ref: AvailabilityZone3
-      CidrBlock:
-        Ref: PrivateSubnet03Block
-      VpcId:
-        Ref: VpcId
-      Tags:
-      - Key: Name
-        Value:
-          Fn::Sub: "${AWS::StackName}-ExpandedPrivateSubnet03"
-      - Key: kubernetes.io/role/internal-elb
-        Value: 1
-      - Key:
-          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
-        Value: shared
-
   PublicSubnet01RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
@@ -237,30 +150,6 @@ Resources:
       RouteTableId:
         Ref: PublicRouteTableId
 
-  PrivateSubnet01RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PrivateSubnet01
-      RouteTableId:
-        Ref: PrivateRouteTable01Id
-
-  PrivateSubnet02RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PrivateSubnet02
-      RouteTableId:
-        Ref: PrivateRouteTable02Id
-
-  PrivateSubnet03RouteTableAssociation:
-    Type: AWS::EC2::SubnetRouteTableAssociation
-    Properties:
-      SubnetId:
-        Ref: PrivateSubnet03
-      RouteTableId:
-        Ref: PrivateRouteTable03Id
-
 Outputs:
 
   PublicSubnet01Id:
@@ -277,18 +166,3 @@ Outputs:
     Description: Public Subnet 3
     Value:
       Ref: PublicSubnet01
-
-  PrivateSubnet01Id:
-    Description: Private Subnet 1
-    Value:
-      Ref: PrivateSubnet01
-
-  PrivateSubnet02Id:
-    Description: Private Subnet 2
-    Value:
-      Ref: PrivateSubnet02
-
-  PrivateSubnet03Id:
-    Description: Private Subnet 3
-    Value:
-      Ref: PrivateSubnet03
