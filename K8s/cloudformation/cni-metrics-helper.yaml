@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Template that sets up IAM policy and role attachment for CNI Metrics Helper
+  and creates a CloudWatch Dashboard.
+
+Parameters:
+
+  ClusterName:
+    Type: String
+    Description: Name of your EKS Cluster.
+
+  NodeGroupRole:
+    Type: String
+    Description: Name of the NodeGroup of your Cluster.
+
+Resources:
+  IAMPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName:
+        Fn::Sub: "CNIMetricsHelperPolicy-${NodeGroupRole}"
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 'cloudwatch:PutMetricData'
+            Resource: '*'
+      Roles:
+        - Ref: NodeGroupRole
+  CloudWatchDashboard:
+    Type: AWS::CloudWatch::Dashboard
+    Properties:
+      DashboardBody:
+        Fn::Sub: |
+          {
+            "widgets": [
+                {
+                    "type": "metric",
+                    "x": 0,
+                    "y": 0,
+                    "width": 24,
+                    "height": 6,
+                    "properties": {
+                        "view": "singleValue",
+                        "stacked": false,
+                        "region": "${AWS::Region}",
+                        "metrics": [
+                            [ "Kubernetes", "totalIPAddresses", "CLUSTER_ID", "${ClusterName}" ],
+                            [ ".", "maxIPAddresses", ".", "." ],
+                            [ ".", "ipamdActionInProgress", ".", "." ],
+                            [ ".", "awsAPILatency", ".", "." ],
+                            [ ".", "assignIPAddresses", ".", "." ],
+                            [ ".", "addReqCount", ".", "." ],
+                            [ ".", "eniAllocated", ".", "." ],
+                            [ ".", "eniMaxAvailable", ".", "." ],
+                            [ ".", "forceRemoveENI", ".", "." ],
+                            [ ".", "forceRemoveIPs", ".", "." ],
+                            [ ".", "awsAPIErr", ".", "." ]
+                        ],
+                        "liveData": true,
+                        "title": "CNI Metrics"
+                    }
+                }
+            ]
+          }
+      DashboardName:
+        Fn::Sub: "CNIMetrics-${ClusterName}"
