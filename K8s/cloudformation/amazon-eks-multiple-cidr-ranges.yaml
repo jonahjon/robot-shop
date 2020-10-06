@@ -1,0 +1,168 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Amazon EKS Multiple CIDR Ranges example to expand IP address spaces in existing VPC.
+  This template assumes the VPC for EKS cluster was created using eksctl.
+
+Parameters:
+
+  ClusterName:
+    Type: String
+    Description: Name of your EKS Cluster.
+
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC Id of your existing Amazon EKS VPC.
+
+  VpcBlock:
+    Type: String
+    Default: 100.64.0.0/16
+    Description: The additional CIDR block for your VPC. This can be 100.64.0.0/10 and 198.19.0.0/16 ranges.
+
+  AvailabilityZone1:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-west-2a
+    Description: First Availability Zone of your Amazon EKS cluster.
+
+  AvailabilityZone2:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-west-2c
+    Description: First Availability Zone of your Amazon EKS cluster.
+
+  AvailabilityZone3:
+    Type: AWS::EC2::AvailabilityZone::Name
+    Default: us-west-2d
+    Description: First Availability Zone of your Amazon EKS cluster.
+
+  PublicRouteTableId:
+    Type: String
+    Description: Route Table Id for the public subnet.
+
+  PublicSubnet01Block:
+    Type: String
+    Default: 100.64.96.0/19
+    Description: CidrBlock for public subnet 01 within the VPC
+
+  PublicSubnet02Block:
+    Type: String
+    Default: 100.64.128.0/19
+    Description: CidrBlock for public subnet 02 within the VPC
+
+  PublicSubnet03Block:
+    Type: String
+    Default: 100.64.160.0/19
+    Description: CidrBlock for public subnet 03 within the VPC
+
+Resources:
+
+  CidrBlock:
+    Type: AWS::EC2::VPCCidrBlock
+    Properties:
+      CidrBlock:
+        Ref: VpcBlock
+      VpcId:
+        Ref: VpcId
+
+  PublicSubnet01:
+    Type: AWS::EC2::Subnet
+    DependsOn: CidrBlock
+    Properties:
+      MapPublicIpOnLaunch: true
+      AvailabilityZone:
+        Ref: AvailabilityZone1
+      CidrBlock:
+        Ref: PublicSubnet01Block
+      VpcId:
+        Ref: VpcId
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: "${AWS::StackName}-ExpandedPublicSubnet01"
+      - Key: kubernetes.io/role/elb
+        Value: 1
+      - Key:
+          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
+        Value: shared
+
+  PublicSubnet02:
+    Type: AWS::EC2::Subnet
+    DependsOn: CidrBlock
+    Properties:
+      MapPublicIpOnLaunch: true
+      AvailabilityZone:
+        Ref: AvailabilityZone2
+      CidrBlock:
+        Ref: PublicSubnet02Block
+      VpcId:
+        Ref: VpcId
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: "${AWS::StackName}-ExpandedPublicSubnet02"
+      - Key: kubernetes.io/role/elb
+        Value: 1
+      - Key:
+          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
+        Value: shared
+
+  PublicSubnet03:
+    Type: AWS::EC2::Subnet
+    DependsOn: CidrBlock
+    Properties:
+      MapPublicIpOnLaunch: true
+      AvailabilityZone:
+        Ref: AvailabilityZone3
+      CidrBlock:
+        Ref: PublicSubnet03Block
+      VpcId:
+        Ref: VpcId
+      Tags:
+      - Key: Name
+        Value:
+          Fn::Sub: "${AWS::StackName}-ExpandedPublicSubnet03"
+      - Key: kubernetes.io/role/elb
+        Value: 1
+      - Key:
+          Fn::Sub: "kubernetes.io/cluster/${ClusterName}"
+        Value: shared
+
+  PublicSubnet01RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet01
+      RouteTableId:
+        Ref: PublicRouteTableId
+
+  PublicSubnet02RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet02
+      RouteTableId:
+        Ref: PublicRouteTableId
+
+  PublicSubnet03RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId:
+        Ref: PublicSubnet03
+      RouteTableId:
+        Ref: PublicRouteTableId
+
+Outputs:
+
+  PublicSubnet01Id:
+    Description: Public Subnet 1
+    Value:
+      Ref: PublicSubnet01
+
+  PublicSubnet02Id:
+    Description: Public Subnet 2
+    Value:
+      Ref: PublicSubnet01
+
+  PublicSubnet03Id:
+    Description: Public Subnet 3
+    Value:
+      Ref: PublicSubnet01
